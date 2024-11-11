@@ -1,141 +1,93 @@
-let cartbtn=document.getElementById('cartValue').innerHTML+=0
-          let productContainer=document.getElementById('product-container');
-            async function fetchdata(){
-                 try{
-                     let response= await fetch('https://fakestoreapi.com/products')
-                     let data=await response.json();
-                     productContainer.innerHTML='';
-                     data.forEach(col=>{
-                        let card=`<div class="col-md-4 mb-4" >
-                        <div class="card text-center">
-                        <img src="${col.image}" alt="Product Image" style="width:100%;height:400px" />
-                        <div class="fs-4">${col.title.length>10? col.title.slice(0,10)+'...':col.title}</div>
-                        <div>${col.description.length > 100 ? col.description.slice(0, 100) + '...' : col.description}</div>
-                        <hr>
-                        <p>${'$'+col.price}</p>
-                        <hr>
-                        <div class="align-content-center">
-                        <button class="btn btn-dark">Details</button>
-                        <button class="btn btn-dark">Add to Cart</button>
-                        </div>
-                        </div>
-                        </div>`
-                        productContainer.innerHTML+=card;
-                         });
-                 }catch{
-                     throw Error('Error fetching products');
-                 }
-                 
-            }
-            document.getElementById('mens-clothing').addEventListener('click',async()=>{
-                try{
-                     let response= await fetch('https://fakestoreapi.com/products')
-                     let data=await response.json();
-                     let menData=data.filter(data=>data.category=="men's clothing");
-                     productContainer.innerHTML='';
-                     menData.forEach(col=>{
-                        let card=`<div class="col-md-4 mb-4" >
-                        <div class="card text-center">
-                        <img src="${col.image}" alt="Product Image" style="width:100%;height:400px" />
-                        <div class="fs-4">${col.title.length>10? col.title.slice(0,10)+'...':col.title}</div>
-                        <div>${col.description.length > 100 ? col.description.slice(0, 100) + '...' : col.description}</div>
-                        <hr>
-                        <p>${'$'+col.price}</p>
-                        <hr>
-                        <div class="align-content-center">
-                        <button class="btn btn-dark">Details</button>
-                        <button class="btn btn-dark">Add to Cart</button>
-                        </div>
-                        </div>
-                        </div>`
-                        productContainer.innerHTML+=card;
-                     });
+let cartValue = document.getElementById('cartValue');
+let productContainer = document.getElementById('product-container');
 
-                }catch{
-                     throw Error('Error fetching products');
-                }
-            });
-            document.getElementById('womens-clothing').addEventListener('click',async()=>{
-                try{
-                     let response= await fetch('https://fakestoreapi.com/products')
-                     let data=await response.json();
-                     let womenData=data.filter(data=>data.category=="women's clothing");
-                     productContainer.innerHTML='';
-                     womenData.forEach(col=>{
-                        let card=`<div class="col-md-4 mb-4" >
-                        <div class="card text-center">
+// Initialize cart count from localStorage
+function updateCartCount() {
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    cartValue.innerHTML = cart.length;
+}
+
+// Call updateCartCount on page load
+updateCartCount();
+
+
+
+async function fetchdata() {
+    try {
+        let response = await fetch('https://fakestoreapi.com/products');
+        let data = await response.json();
+        productContainer.innerHTML = '';
+        data.forEach(col => {
+            let card = `
+                <div class="col-md-4 mb-4">
+                    <div class="card text-center">
                         <img src="${col.image}" alt="Product Image" style="width:100%;height:400px" />
-                        <div class="fs-4">${col.title.length>10? col.title.slice(0,10)+'...':col.title}</div>
+                        <div class="fs-4">${col.title.length > 10 ? col.title.slice(0, 10) + '...' : col.title}</div>
                         <div>${col.description.length > 100 ? col.description.slice(0, 100) + '...' : col.description}</div>
                         <hr>
-                        <p>${'$'+col.price}</p>
+                        <p>${'$' + col.price}</p>
                         <hr>
                         <div class="align-content-center">
-                        <button class="btn btn-dark">Details</button>
-                        <button class="btn btn-dark">Add to Cart</button>
+                            <button class="btn btn-dark">Details</button>
+                            <button class="btn btn-dark" onclick="addToCart(${col.id})">Add to Cart</button>
                         </div>
-                        </div>
-                        </div>`
-                        productContainer.innerHTML+=card;
-                     });
+                    </div>
+                </div>`;
+            productContainer.innerHTML += card;
+        });
+    } catch (error) {
+        console.error('Error fetching products:', error);
+    }
+}
 
-                }catch{
-                     throw Error('Error fetching products');
-                }
-            });
-            document.getElementById('jewelery').addEventListener('click',async()=>{
-                try{
-                     let response= await fetch('https://fakestoreapi.com/products')
-                     let data=await response.json();
-                     let jeweleryData=data.filter(data=>data.category=="jewelery");
-                     productContainer.innerHTML='';
-                     jeweleryData.forEach(col=>{
-                        let card=`<div class="col-md-4 mb-4" >
-                        <div class="card text-center">
+// Add product to cart in localStorage
+function addToCart(productId) {
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    let product = cart.find(item => item.id === productId);
+
+    if (product) {
+        product.quantity++;
+    } else {
+        cart.push({ id: productId, quantity: 1 });
+    }
+
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartCount();
+}
+// Event Listeners for category buttons
+document.getElementById('mens-clothing').addEventListener('click', () => filterByCategory("men's clothing"));
+document.getElementById('womens-clothing').addEventListener('click', () => filterByCategory("women's clothing"));
+document.getElementById('jewelery').addEventListener('click', () => filterByCategory("jewelery"));
+document.getElementById('Electronics').addEventListener('click', () => filterByCategory("electronics"));
+
+// Filter Functions
+async function filterByCategory(category) {
+    try {
+        let response = await fetch('https://fakestoreapi.com/products');
+        let data = await response.json();
+        let filteredData = data.filter(item => item.category === category);
+        productContainer.innerHTML = '';
+        filteredData.forEach(col => {
+            let card = `
+                <div class="col-md-4 mb-4">
+                    <div class="card text-center">
                         <img src="${col.image}" alt="Product Image" style="width:100%;height:400px" />
-                        <div class="fs-4">${col.title.length>10? col.title.slice(0,10)+'...':col.title}</div>
+                        <div class="fs-4">${col.title.length > 10 ? col.title.slice(0, 10) + '...' : col.title}</div>
                         <div>${col.description.length > 100 ? col.description.slice(0, 100) + '...' : col.description}</div>
                         <hr>
-                        <p>${'$'+col.price}</p>
+                        <p>${'$' + col.price}</p>
                         <hr>
                         <div class="align-content-center">
-                        <button class="btn btn-dark">Details</button>
-                        <button class="btn btn-dark">Add to Cart</button>
+                            <button class="btn btn-dark">Details</button>
+                            <button class="btn btn-dark" onclick="addToCart(${col.id})">Add to Cart</button>
                         </div>
-                        </div>
-                        </div>`
-                        productContainer.innerHTML+=card;
-                     });
+                    </div>
+                </div>`;
+            productContainer.innerHTML += card;
+        });
+    } catch (error) {
+        console.error('Error filtering products:', error);
+    }
+}
 
-                }catch{
-                     throw Error('Error fetching products');
-                }
-            });
-            document.getElementById('Electronics').addEventListener('click',async()=>{
-                try{
-                     let response= await fetch('https://fakestoreapi.com/products')
-                     let data=await response.json();
-                     let electronicsData=data.filter(data=>data.category=="electronics");
-                     productContainer.innerHTML='';
-                     electronicsData.forEach(col=>{
-                        let card=`<div class="col-md-4 mb-4" >
-                        <div class="card text-center">
-                        <img src="${col.image}" alt="Product Image" style="width:100%;height:400px" />
-                        <div class="fs-4">${col.title.length>10? col.title.slice(0,10)+'...':col.title}</div>
-                        <div>${col.description.length > 100 ? col.description.slice(0, 100) + '...' : col.description}</div>
-                        <hr>
-                        <p>${'$'+col.price}</p>
-                        <hr>
-                        <div class="align-content-center">
-                        <button class="btn btn-dark">Details</button>
-                        <button class="btn btn-dark">Add to Cart</button>
-                        </div>
-                        </div>
-                        </div>`
-                        productContainer.innerHTML+=card;
-                     });
 
-                }catch{
-                     throw Error('Error fetching products');
-                }
-            });
