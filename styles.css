@@ -1,0 +1,19 @@
+div a{
+    text-decoration: none;
+    color: dimgray;
+    padding-right: 10px;
+}
+div a:hover{
+    color: black;
+}
+#bannercontent{
+    position: relative;
+    bottom: 400px;
+}
+#header{
+    position: sticky;
+    top: 0px;
+    z-index: 1000;
+    background-color:whitesmoke;
+    
+}
