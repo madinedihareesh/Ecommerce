@@ -15,25 +15,26 @@ updateCartCount();
 async function fetchdata() {
     try {
         let response = await fetch('https://fakestoreapi.com/products');
-        let data = await response.json();
+        products = await response.json();
         productContainer.innerHTML = '';
-        data.forEach(col => {
+        products.forEach((item,index) => {
             let card = `
                 <div class="col-md-4 mb-4">
                     <div class="card text-center">
-                        <img src="${col.image}" alt="Product Image" style="width:100%;height:400px" />
-                        <div class="fs-4">${col.title.length > 10 ? col.title.slice(0, 10) + '...' : col.title}</div>
-                        <div>${col.description.length > 100 ? col.description.slice(0, 100) + '...' : col.description}</div>
+                        <img src="${item.image}" alt="Product Image" style="width:100%;height:400px" />
+                        <div class="fs-4">${item.title.length > 10 ? item.title.slice(0, 10) + '...' : item.title}</div>
+                        <div>${item.description.length > 100 ? item.description.slice(0, 100) + '...' : item.description}</div>
                         <hr>
-                        <p>${'$' + col.price}</p>
+                        <p>${'$' + item.price}</p>
                         <hr>
                         <div class="align-content-center">
                             <button class="btn btn-dark">Details</button>
-                            <button class="btn btn-dark" onclick="addToCart(${col.id})">Add to Cart</button>
+                            <button class="btn btn-dark" onclick="addToCart(${index})">Add to Cart</button>
                         </div>
                     </div>
                 </div>`;
             productContainer.innerHTML += card;
+       
         });
     } catch (error) {
         console.error('Error fetching products:', error);
@@ -41,14 +42,18 @@ async function fetchdata() {
 }
 
 // Add product to cart in localStorage
-function addToCart(productId) {
+function addToCart(selectedIndex) {
+    let product = products[selectedIndex];
+    var productId=product.id;
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
-    let product = cart.find(item => item.id === productId);
+    let productIndex = cart.findIndex(item => item.id === productId);
 
-    if (product) {
-        product.quantity++;
+    if (productIndex>=0) {
+       cart[productIndex].quantity++;
     } else {
-        cart.push({ id: productId, quantity: 1 });
+        product.quantity=1;
+        cart.push(product);
+
     }
 
     localStorage.setItem('cart', JSON.stringify(cart));
@@ -67,23 +72,23 @@ async function filterByCategory(category) {
         let data = await response.json();
         let filteredData = data.filter(item => item.category === category);
         productContainer.innerHTML = '';
-        filteredData.forEach(col => {
+        filteredData.forEach((item,index) => {
             let card = `
-                <div class="col-md-4 mb-4">
-                    <div class="card text-center">
-                        <img src="${col.image}" alt="Product Image" style="width:100%;height:400px" />
-                        <div class="fs-4">${col.title.length > 10 ? col.title.slice(0, 10) + '...' : col.title}</div>
-                        <div>${col.description.length > 100 ? col.description.slice(0, 100) + '...' : col.description}</div>
-                        <hr>
-                        <p>${'$' + col.price}</p>
-                        <hr>
-                        <div class="align-content-center">
-                            <button class="btn btn-dark">Details</button>
-                            <button class="btn btn-dark" onclick="addToCart(${col.id})">Add to Cart</button>
-                        </div>
+            <div class="col-md-4 mb-4">
+                <div class="card text-center">
+                    <img src="${item.image}" alt="Product Image" style="width:100%;height:400px" />
+                    <div class="fs-4">${item.title.length > 10 ? item.title.slice(0, 10) + '...' : item.title}</div>
+                    <div>${item.description.length > 100 ? item.description.slice(0, 100) + '...' : item.description}</div>
+                    <hr>
+                    <p>${'$' + item.price}</p>
+                    <hr>
+                    <div class="align-content-center">
+                        <button class="btn btn-dark">Details</button>
+                        <button class="btn btn-dark" onclick="addToCart(${index})">Add to Cart</button>
                     </div>
-                </div>`;
-            productContainer.innerHTML += card;
+                </div>
+            </div>`;
+        productContainer.innerHTML += card;
         });
     } catch (error) {
         console.error('Error filtering products:', error);
