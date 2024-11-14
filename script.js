@@ -95,4 +95,74 @@ async function filterByCategory(category) {
     }
 }
 
+function displayProducts(){
+    let itemContainer=document.getElementById('itemContainer')
+    let priceContainer=document.getElementById('priceContainer')
+    let cart =JSON.parse(localStorage.getItem('cart'));
+    let totalPrice = 0; 
+    if(cart){
+        document.getElementById('emptyCart').style.display='none';
+        document.getElementById('SelectedItems').style.display='block';
+    }else  {
+        document.getElementById('emptyCart').style.display='block';
+        document.getElementById('SelectedItems').style.display='none';
+    }
+     
+    cart.forEach((item,index)=>{
+        totalPrice +=Math.floor( item.price * item.quantity);
+        let card=`<div class="d-flex justify-content-between border-bottom">
+        <div>
+        <img src=${item.image} alt="Productimage" width="100px" height="100px">
+        </div>
+        <div>${item.title.length>20? item.title.slice(0,12)+"...":item.title}</div>
+        <div>
+        <div><button onclick="decreaseQuantity(${index})" class="btn btn-none">-</button>${item.quantity}<button onclick="increaseQuantity(${index})" class="btn btn-none">+</button></div>
+        <div>${item.quantity}×$${item.price}</div>
+        </div>
+        </div>`
+        itemContainer.innerHTML+=card;
 
+
+    });
+     
+    priceContainer.innerHTML+=`<section class="ps-2 pe-2 pb-2" >
+    <div class="d-flex">
+    <div >
+    <div>Total Products(${cart.length})</div>
+    <div>shipping</div>
+    <div>Total amount</div>
+    </div>
+    <div class=" ms-5 text-end ps-5">
+    <div>$${totalPrice}</div>
+    <div>$30</div>
+    <div>$${totalPrice+30}</div>
+    </div>
+    </div>
+    <div class="text-center">
+    <button class="btn btn-dark ps-5 pe-5">GO to Checkout</button>
+    <div>
+    </section>`;
+
+    
+}
+
+
+function increaseQuantity(index) {
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    cart[index].quantity += 1;  // Increase quantity by 1
+    localStorage.setItem('cart', JSON.stringify(cart));  // Update localStorage
+    displayProducts();  // Refresh display
+}
+
+// Function to decrease quantity
+function decreaseQuantity(index) {
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    if (cart[index].quantity > 1) {
+        cart[index].quantity -= 1;  // Decrease quantity by 1
+    } else {
+        // Optional: Remove item if quantity is 1 and user clicks '-'
+        cart.splice(index, 1);
+    }
+    localStorage.setItem('cart', JSON.stringify(cart));  // Update localStorage
+    displayProducts();  // Refresh display
+}
