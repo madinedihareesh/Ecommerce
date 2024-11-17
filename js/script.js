@@ -17,7 +17,7 @@ async function fetchdata() {
         productContainer.innerHTML = '';
         products.forEach((item, index) => {
             let card = `
-                <div class="col-md-4 mb-4">
+                <div class="col-md-4 col-sm-12 mb-4">
                     <div class="card text-center">
                         <img src="${item.image}" alt="Product Image" style="width:100%;height:400px" />
                         <div class="fs-4">${item.title.length > 10 ? item.title.slice(0, 10) + '...' : item.title}</div>
@@ -70,7 +70,7 @@ async function filterByCategory(category) {
         productContainer.innerHTML = '';
         filteredData.forEach((item, index) => {
             let card = `
-                <div class="col-md-4 mb-4">
+                <div class="col-md-4  mb-4">
                     <div class="card text-center">
                         <img src="${item.image}" alt="Product Image" style="width:100%;height:400px" />
                         <div class="fs-4">${item.title.length > 10 ? item.title.slice(0, 10) + '...' : item.title}</div>
@@ -114,7 +114,7 @@ function displayProducts() {
             totalPrice += Math.floor(item.price * item.quantity);
             let card = `
             
-                <div class="d-flex justify-content-between border-bottom">
+                <div class="container d-flex justify-content-between border-bottom">
                     <div>
                         <img src="${item.image}" alt="Product Image" width="150px" height="150px">
                     </div>
