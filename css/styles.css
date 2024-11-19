@@ -17,3 +17,6 @@ div a:hover{
     background-color:whitesmoke;
     
 }
+body{
+    overflow-x: hidden;
+}
